@@ -3,6 +3,7 @@ import psycopg2
 from datetime import datetime
 import time
 import os
+import json
 
 def esperar_postgres(max_intentos = 10):
     """"Esperar a que PostgreSQL este listo antes de conectar"""
@@ -107,6 +108,44 @@ def cargar_en_postgres(filas_limpias):
     conn.close()
     return len(filas_limpias)
 
+def generar_reporte():
+    """Generar un reporte JSON con estadisticas del pipeline"""
+    conn = psycopg2.connect(
+        host = os.getenv("DB_HOST", "postgres"),
+        port = 5432,
+        user = os.getenv("DB_USER", "etl_user"),
+        password = os.getenv("DB_PASS", "etl_secreto"),
+        database = os.getenv("DB_NAME", "ventas")
+    )
+    cursor = conn.cursor()
+
+    # Total de filas cargadas
+    cursor.execute("___")
+    total_filas = cursor.fetchone()[0]
+
+    # Suma total de ventas
+    cursor.execute("___")
+    total_ventas = float(cursor.fetchone()[0] or 0)
+
+    # Ciudad con mas ventas
+    cursor.execute("___")
+    top_ciudad = cursor.fetchone()
+
+    reporte = {
+        'total_filas': total_filas,
+        'total_ventas': round(total_ventas, 2),
+        'top_ciudad': {"nombre": top_ciudad[0], "total": float(top_ciudad[1])}
+    }
+
+    conn.close()
+
+    # Guardar reporte
+    os.makedirs("/app/output", exist_ok=True)
+    with open("/app/output/reporte.json", 'w', encoding='utf-8') as f:
+        json.dump(reporte, f, ensure_ascii=False, indent=4)
+
+    print(f"Reporte generado: {reporte}")    
+
 if __name__ == "__main__":
     print("=" * 50)
     print("Pipeline ETL iniciado")
@@ -133,6 +172,10 @@ if __name__ == "__main__":
     print("\nCargando en PostgreSQL...")
     insertadas = cargar_en_postgres(datos_limpios)
     print(f"  Filas insertadas: {insertadas}")
+
+    # Report
+    print("\nGenerando reporte...")
+    generar_reporte()
 
     print("\n[OK] Pipeline completo exitosamente!")
     print("=" * 50)
