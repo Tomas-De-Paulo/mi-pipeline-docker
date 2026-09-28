@@ -116,7 +116,7 @@ if __name__ == "__main__":
 
     # Extract
     print("\nExtrayendo datos del CSV...")
-    datos_crudos = leer_csv('app/data/ventas_raw.csv')
+    datos_crudos = leer_csv('data/ventas_raw.csv')
     print(f"   Filas leidas: {len(datos_crudos)}")
 
     # Transform
