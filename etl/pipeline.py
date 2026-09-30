@@ -120,15 +120,21 @@ def generar_reporte():
     cursor = conn.cursor()
 
     # Total de filas cargadas
-    cursor.execute("___")
+    cursor.execute("SELECT COUNT(*) FROM ventas_limpias")
     total_filas = cursor.fetchone()[0]
 
     # Suma total de ventas
-    cursor.execute("___")
+    cursor.execute("SELECT SUM(total) FROM ventas_limpias")
     total_ventas = float(cursor.fetchone()[0] or 0)
 
     # Ciudad con mas ventas
-    cursor.execute("___")
+    cursor.execute("""
+        SELECT ciudad, SUM(total) as total_ciudad
+        FROM ventas_limpias
+        GROUP BY ciudad
+        ORDER BY total_ciudad DESC
+        LIMIT 1
+    """)
     top_ciudad = cursor.fetchone()
 
     reporte = {
