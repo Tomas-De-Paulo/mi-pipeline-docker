@@ -39,6 +39,7 @@ services:
         condition: service_healthy
     volumes:
       - ./data:/app/data # Montar los CSVs
+      - ./output:/app/output # Montar la carpeta de salida
 
 volumes:
   pgdata:
